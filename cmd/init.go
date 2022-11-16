@@ -6,8 +6,9 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/spf13/cobra"
 	"github.com/FDU-YSP/spmanager/util"
+	"github.com/spf13/cobra"
+	"os"
 	"path/filepath"
 )
 
@@ -40,9 +41,26 @@ func GenerateConfigFilesForSPM(force bool) {
 	if confighome := util.HomeDir(); confighome != "" {
 		// fmt.Println(confighome)
 		spmconfig = filepath.Join(confighome, ".spmanager", "spm.conf")
-		fmt.Println(spmconfig)
+
 	} else {
 		fmt.Println("config home is null")
+	}
+
+	// check whether spm.conf exist
+	if _, err := os.Stat(spmconfig); err != nil {
+		// spm.conf not exist, try to create new config file
+		if _, err := os.Create(spmconfig);  err != nil {
+			fmt.Printf("Create config file error: %s", err.Error())
+		} else {
+			fmt.Println("Create config file success.")
+		}
+	} else {
+		// spm.conf exist
+		if force == false {
+			fmt.Println("spmanager config file exist, will not override.")
+		} else {
+			fmt.Println("spmanager config file exist, will override.")
+		}
 	}
 }
 
